@@ -3,7 +3,7 @@
 
 效果演示视频:https://www.bilibili.com/video/av771953100
 
-使用前需先申请微软文本转语音秘钥(https://azure.microsoft.com/zh-cn/services/cognitive-services/text-to-speech/#overview)
+(免费版测试中)使用前需先申请微软文本转语音秘钥(https://azure.microsoft.com/zh-cn/services/cognitive-services/text-to-speech/#overview)
 
 教程请搜索"无需信用卡怎么用微软azure"(正常情况下需要visa/万事达银行卡,本人visa信用卡不行,提示不支持预付卡,但是万事达借记卡可以)
 
