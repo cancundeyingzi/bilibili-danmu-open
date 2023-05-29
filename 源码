@@ -1,0 +1,174 @@
+import os
+import datetime
+import  xml.dom.minidom
+import colorama
+from future.moves import _thread
+
+colorama.init(autoreset=True)
+#官方教程https://docs.microsoft.com/zh-cn/azure/cognitive-services/speech-service/get-started-text-to-speech?pivots=programming-language-python&tabs=terminal
+import azure.cognitiveservices.speech as speechsdk
+import time
+from typing import Dict, TypedDict
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from bilibili_api import live, sync
+
+
+import threading
+
+os.system("title 神经网络引擎弹幕朗读----制作:残存の影子")
+class Gift(TypedDict):
+    username: str#用户名
+    last_gift_time: int#最后一次赠送礼物时时间戳
+    gift_list: Dict[str, int]#赠送的礼物字典，格式 礼物名: 数量
+
+user_list: Dict[int, Gift] = dict()
+sched = AsyncIOScheduler(timezone="Asia/Shanghai")  # 定时任务框架,上海这玩意没啥用
+
+
+
+def 微软语音(microsoftkey,microsoftregion,voice_name,out):#                  微软语音模块
+    # 获取锁，用于线程同步
+    threadLock.acquire()
+    speech_config = speechsdk.SpeechConfig(subscription=microsoftkey, region=microsoftregion)
+    audio_config = speechsdk.audio.AudioOutputConfig(use_default_speaker=True)
+
+    speech_config.speech_synthesis_voice_name = voice_name  # 语音人物代码https://docs.microsoft.com/zh-cn/azure/cognitive-services/speech-service/language-support?tabs=speechtotext#prebuilt-neural-voices
+
+    speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)
+    text = out
+
+    speech_synthesis_result = speech_synthesizer.speak_text_async(text).get()
+    # 释放锁，开启下一个线程
+    threadLock.release()
+
+
+
+
+def 语音控制(out):
+    o=1
+    _thread.start_new_thread( 微软语音,(microsoftkey, microsoftregion, voice_name, out))
+
+运行检测=0
+while(运行检测==0):
+    # 配置文件相关操作全在这一段
+    print('感谢b站@脆鲨12138提供直播间礼物统计方法\n使用了@Nemo2011的python-bilibili-api和微软认知服务制作\n残存の影子bilibili直播间21409771')
+    dom = xml.dom.minidom.parse('peizhi.xml')
+    microsoftkey列表 = dom.getElementsByTagName('microsoftkey')
+    microsoftkey地址 = microsoftkey列表[0]  # 第n+1个
+    microsoftkey = microsoftkey地址.firstChild.data  # 微软api秘钥
+    microsoftregion列表 = dom.getElementsByTagName('microsoftregion')
+    microsoftregion地址 = microsoftregion列表[0]  # 第n+1个
+    microsoftregion = microsoftregion地址.firstChild.data  # 微软api地区
+    弹幕前景 = dom.getElementsByTagName('弹幕前景')[0].firstChild.data  # 0表示配置文件中第一个弹幕前景,1就是表示第二个
+    弹幕背景 = dom.getElementsByTagName('弹幕背景')[0].firstChild.data
+    礼物前景 = dom.getElementsByTagName('礼物前景')[0].firstChild.data
+    礼物背景 = dom.getElementsByTagName('礼物背景')[0].firstChild.data
+    欢迎前景 = dom.getElementsByTagName('欢迎前景')[0].firstChild.data
+    欢迎背景 = dom.getElementsByTagName('欢迎背景')[0].firstChild.data
+    礼物开头 = dom.getElementsByTagName('礼物开头')[0].firstChild.data
+    礼物结尾 = dom.getElementsByTagName('礼物结尾')[0].firstChild.data
+    sc开头 = dom.getElementsByTagName('sc开头')[0].firstChild.data
+    sc结尾 = dom.getElementsByTagName('sc结尾')[0].firstChild.data
+    sc前景 = dom.getElementsByTagName('sc前景')[0].firstChild.data
+    sc背景 = dom.getElementsByTagName('sc背景')[0].firstChild.data
+
+    biliroom = input('输入房间号')
+    print(
+        '中文（粤语，繁体）	zh-HK	Female	zh-HK-HiuGaaiNeural	常规\n中文（粤语，繁体）	zh-HK	Female	zh-HK-HiuMaanNeural	常规\n中文(粤语，繁体)	 zh-HK	男	zh-HK-WanLungNeural	常规\n中文（普通话，简体）	zh-CN	女	zh-CN-XiaochenNeural	针对自发对话进行了优化\n中文（普通话，简体）	zh-CN	女	zh-CN-XiaohanNeural	常规，使用 SSML 提供多种风格\n中文（普通话，简体）	zh-CN	女	zh-CN-XiaomoNeural	常规，使用 SSML 提供多种角色扮演和风格\n中文（普通话，简体）	zh-CN	女	zh-CN-XiaoqiuNeural	针对叙事进行了优化\n中文（普通话，简体）	zh-CN	女	zh-CN-XiaoruiNeural	高级语音，使用 SSML 提供多种风格\n中文（普通话，简体）	zh-CN	女	zh-CN-XiaoshuangNeural	儿童语音，针对儿童故事和聊天进行了优化；使用 SSML 提供多种语音风格\n中文（普通话，简体）	zh-CN	Female	zh-CN-XiaoxiaoNeural	常规，使用 SSML 提供多种语音风格\n中文（普通话，简体）	zh-CN	女	zh-CN-XiaoxuanNeural	常规，使用 SSML 提供多种角色扮演和风格\n中文（普通话，简体）	zh-CN	女	zh-CN-XiaoyanNeural	针对客户服务进行了优化\n中文（普通话，简体）	zh-CN	女	zh-CN-XiaoyouNeural	儿童语音，针对讲故事进行了优化\n中文（普通话，简体）	zh-CN	男	zh-CN-YunxiNeural	常规，使用 SSML 提供多种风格\n中文（普通话，简体）	zh-CN	男	zh-CN-YunyangNeural	针对新闻阅读进行了优化，使用 SSML 提供多种语音风格\n中文（普通话，简体）	zh-CN	男	zh-CN-YunyeNeural	针对使用 SSML 提供的故事讲述、多种角色扮演和风格进行了优化\n中文(台湾普通话)	zh-TW	Female	zh-TW-HsiaoChenNeural	常规\n中文(台湾普通话)	 zh-TW	Female	zh-TW-HsiaoYuNeural	常规\n中文(台湾普通话)	 zh-TW	男	zh-TW-YunJheNeural	常规')
+    voice_name = input('输入音色')
+    room = live.LiveDanmaku(biliroom)  # 此处括号输入房间号
+    threadLock = threading.Lock()  # 创建个锁给微软语音用
+
+
+    @room.on('DANMU_MSG')
+    async def 收到弹幕(event):
+        # 收到弹幕
+        user = (event['data']['info'][2][1])
+        statements = (event['data']['info'][1])
+        out = '(' + user + ') 说:' + statements
+        thistime = datetime.datetime.now()
+        print('\033[1;' + 弹幕前景 + ';' + 弹幕背景 + 'm' + str(thistime)[0:19] + out)
+        语音控制(out)
+
+
+    @room.on('SEND_GIFT')
+    async def 收到礼物(event):
+        '记录礼物'
+        info = event['data']['data']  # 提取获取到的内容,方便下一步.
+        uid = info['uid']
+        user = user_list.get(uid)  # 看看列表里有没有这个用户的uid,方便下面if操作
+        if user:
+            # 如果用户列表中有该用户 则更新他的礼物字典以及礼物时间戳
+            num = user['gift_list'].get(info['giftName'], 0)  # 在列表中寻找info里giftName的数量...列表里有5辣条,info里又来了辣条,num=5
+            user['gift_list'][info['giftName']] = num + info['num']  # 加上该礼物的数量.不仅可以可以更新值，也可以在项不存在时新建项（此处为礼物）
+            user['last_gift_time'] = int(time.time())  # 更新时间
+        else:
+            # 不存在则以现在时间及礼物新建 Gift 对象
+            user_list[uid] = Gift(
+                username=info['uname'],
+                last_gift_time=int(time.time()),
+                gift_list={info['giftName']: info['num']}
+            )
+            # 开启一个监控
+            sched.add_job(监控作业, 'interval', seconds=1, args=[uid], id=str(uid))  # args是传进去的参数,id是任务名称
+            # 其中 sched 是前文提到的 AsyncIOScheduler()它的使用方法可参考 Python apscheduler安装和基本使用简单来说就是 interval 表示间隔调度任务
+            # 其后的 seconds=1 表示每间隔 1 秒就执行一次任务在本代码中用处就是每秒判断一次距离上次送礼有没有超过 5 秒
+
+
+    async def 监控作业(uid: int):
+        '判断是否超过阈值并输出'
+        user = user_list.get(uid)
+        if user:
+            if int(time.time()) - user.get('last_gift_time', 0) > 3:  # 此处的 3 即需求中的 n 表示秒数
+                sched.remove_job(str(uid))  # 移除该监控任务
+                whatever = user_list.pop(uid)
+                out = 礼物开头 + '(' + whatever['username'] + ')赠送的' + '、'.join(
+                    [str(v) + '个' + k for k, v in whatever['gift_list'].items()]) + 礼物结尾
+                thistime = datetime.datetime.now()
+                print('\033[1;' + 礼物前景 + ';' + 礼物背景 + 'm' + str(thistime)[0:19] + out)
+                语音控制(out)
+
+
+    @room.on('INTERACT_WORD')
+    async def 观众进入(event):  #
+        # 观众进入房间
+        user_join = (event['data']['data']['uname'])
+        timestamp = time.time()
+        # print(timestamp)#因为时区问题,所以顺序奇怪
+        n = 0  # 当前时间是第n+1个时间段
+        时间段列表 = dom.getElementsByTagName('时间段')
+        时间段地址 = 时间段列表[n]  # 第n+1个
+        时间段 = 时间段地址.firstChild.data
+        while timestamp % 86400 > int(时间段):
+            n = n + 1
+            时间段地址 = 时间段列表[n]  # 第n+1个时间段
+            时间段 = 时间段地址.firstChild.data
+        开头列表 = dom.getElementsByTagName('开头')
+        开头地址 = 开头列表[n]  # 第n+1个
+        开头 = 开头地址.firstChild.data
+        结尾列表 = dom.getElementsByTagName('结尾')
+        结尾地址 = 结尾列表[n]  # 第n+1个
+        结尾 = 结尾地址.firstChild.data
+        out = (开头 + '(' + user_join + ')' + 结尾)
+        thistime = datetime.datetime.now()
+        print('\033[1;' + 欢迎前景 + ';' + 欢迎背景 + 'm' + str(thistime)[0:19] + out)
+        语音控制(out)
+
+
+    @room.on('SUPER_CHAT_MESSAGE')
+    async def 收到sc(event):
+        out = sc开头 + '(' + event['data']['data']['user_info']['uname'] + ')的' + str(
+            event['data']['data']['price']) + '元sc:' + event['data']['data']['message'] + sc结尾
+        thistime = datetime.datetime.now()
+        print(
+            '\033[1;' + sc前景 + ';' + sc背景 + 'm' + str(thistime)[0:19] + out + str(event['data']['data']['time']) + '秒')
+        语音控制(out)
+
+
+    sched.start()  # 启动定时任务
+    try:
+        sync(room.connect())
+        运行检测 = 1
+    except:
+        input('遇到错误,可能是房间号错了,按回车重试')
+
